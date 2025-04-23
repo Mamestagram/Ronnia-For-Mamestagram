@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public abstract class User {
+public abstract class UserAccount {
 
     static String url = "https://api.twitch.tv/helix/users?";
 

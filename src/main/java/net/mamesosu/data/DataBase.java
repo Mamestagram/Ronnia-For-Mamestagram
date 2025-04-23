@@ -12,7 +12,6 @@ public class DataBase {
 
     String host;
     String database;
-    String port;
     String user;
     String password;
 
@@ -21,19 +20,14 @@ public class DataBase {
         this.host = dotenv.get("DB_HOST");
         this.database = dotenv.get("DB_DATABASE");
         this.user = dotenv.get("DB_USER");
-        this.port = dotenv.get("DB_PORT");
+        this.password = dotenv.get("DB_PASSWORD");
     }
 
-    public Connection getConnection() {
-        try {
+    public Connection getConnection() throws SQLException{
             return DriverManager.getConnection(
                     "jdbc:mysql://" + host + "/" + database + "?useSSL=false",
                     user,
                     password
             );
-        } catch (SQLException ex) {
-            System.out.println("MySQL connection error: " + ex.getMessage());
-            throw new RuntimeException();
-        }
     }
 }

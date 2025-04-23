@@ -5,7 +5,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import net.mamesosu.data.DataBase;
 import net.mamesosu.irc.event.RequestMap;
-import net.mamesosu.twitch.User;
+import net.mamesosu.twitch.UserAccount;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 
@@ -35,20 +35,21 @@ public class IRCService {
         DataBase dataBase = new DataBase();
         PreparedStatement ps;
         ResultSet result;
-        Connection connection = dataBase.getConnection();
         List<String> userList = new ArrayList<>();
 
         try {
+            Connection connection = dataBase.getConnection();
             ps = connection.prepareStatement("select * from users where twitch_id != 0");
             result = ps.executeQuery();
             while (result.next()) {
                 long userID = result.getLong("twitch_id");
-                String twitchName = User.getUserName(String.valueOf(userID));
+                String twitchName = UserAccount.getUserName(String.valueOf(userID));
                 if (twitchName == null) {
                     continue;
                 }
 
                 userList.add("#" + twitchName);
+                System.out.println("Adding " + twitchName + " to auto join list");
             }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
