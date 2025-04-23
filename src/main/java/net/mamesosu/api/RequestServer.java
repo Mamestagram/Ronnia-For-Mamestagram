@@ -19,8 +19,7 @@ public class RequestServer {
     public void startServer() {
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-            server.createContext("/add_user", new AddUser());
-            server.createContext("/edit_user", new EditUser());
+            server.createContext("/user", new User());
             server.setExecutor(null); // creates a default executor
 
             System.out.println("Web server started on port " + port);

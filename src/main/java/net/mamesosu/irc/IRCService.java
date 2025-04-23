@@ -4,6 +4,7 @@ package net.mamesosu.irc;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import net.mamesosu.data.DataBase;
+import net.mamesosu.irc.event.RequestMap;
 import net.mamesosu.twitch.User;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -58,6 +59,7 @@ public class IRCService {
                 .setServer("irc.chat.twitch.tv", 6667)
                 .setServerPassword(oAuthPassword)
                 .addAutoJoinChannels(userList)
+                .addListener(new RequestMap())
                 .buildConfiguration();
 
         bot = new PircBotX(configuration);

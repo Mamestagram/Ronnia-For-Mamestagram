@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import net.mamesosu.Main;
 import net.mamesosu.data.DataBase;
-import net.mamesosu.twitch.User;
+import net.mamesosu.irc.IRCService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +16,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 // プライベートAPIサーバー
-public class AddUser implements HttpHandler {
+// Twitchの名前の編集と追加
+
+public class User implements HttpHandler {
 
     /*
     * {
@@ -42,7 +45,8 @@ public class AddUser implements HttpHandler {
 
             int userID = node.get("id").asInt();
             String twitchName = node.get("name").asText();
-            int twitchID = User.getUserID(twitchName);
+            int twitchID = net.mamesosu.twitch.User.getUserID(twitchName);
+            IRCService irc = Main.irc;
 
             if(twitchID == 0) {
                 System.out.println("User not found");
@@ -59,6 +63,7 @@ public class AddUser implements HttpHandler {
                 ps.setInt(1, twitchID);
                 ps.setInt(2, userID);
                 ps.executeUpdate();
+                irc.getBot().send().joinChannel("#" + twitchName);
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 exchange.sendResponseHeaders(500, -1); // サーバーエラー
