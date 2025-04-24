@@ -28,76 +28,75 @@ public class RequestMap extends ListenerAdapter {
     final String URL_REGEX = "https://osu\\.ppy\\.sh/beatmapsets/(\\d+)#(osu|taiko|fruits|mania)/(\\d+)";
 
     @Override
-    public void onMessage(org.pircbotx.hooks.events.MessageEvent event){
+    public void onMessage(org.pircbotx.hooks.events.MessageEvent event) {
 
-        if(!event.getMessage().contains("!req")) {
-            return;
-        }
+        if (event.getMessage().contains("!req") || event.getMessage().contains("!request")) {
 
-        try {
+            try {
 
-            String[] message = event.getMessage().split(" ");
+                String[] message = event.getMessage().split(" ");
 
-            if (message.length != 2) {
-                return;
-            }
-
-            Pattern pattern = Pattern.compile(URL_REGEX);
-            Matcher matcher = pattern.matcher(message[1]);
-
-            IRCService irc = Main.irc;
-
-            int twitchUserID = UserAccount.getUserID(event.getChannel().getName().replace("#", ""));
-
-            DataBase dataBase = new DataBase();
-            Connection connection = dataBase.getConnection();
-            PreparedStatement ps;
-            ResultSet result;
-
-            if (matcher.find()) {
-                Osu osu = new Osu();
-
-                ps = connection.prepareStatement("select * from users where twitch_id = ?");
-                ps.setLong(1, twitchUserID);
-                result = ps.executeQuery();
-
-                if (result.next()) {
-
-                    int osuUserID = result.getInt("id");
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    Map<String, Object> jsonMap = new HashMap<>();
-
-                    jsonMap.put("key", osu.getSecretKey());
-                    jsonMap.put("id", osuUserID);
-                    jsonMap.put("requester", event.getUser().getNick());
-                    jsonMap.put("set_id", Integer.parseInt(matcher.group(1)));
-                    jsonMap.put("map_id", Integer.parseInt(matcher.group(3)));
-                    jsonMap.put("map_name", Beatmap.getBeatmapTitle(matcher.group(3)));
-
-                    String jsonBody = mapper.writeValueAsString(jsonMap);
-
-                    String url = String.format(
-                            "https://api.%s/v1/send_request_message",
-                            osu.getBaseDomain());
-
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(url))
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                            .build();
-
-                    HttpClient client = HttpClient.newHttpClient();
-
-                    client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-
-                    irc.getBot().send().message(event.getChannel().getName(),
-                            Beatmap.getBeatmapTitle(matcher.group(3)) +
-                                    " - Request sent!");
+                if (message.length != 2) {
+                    return;
                 }
+
+                Pattern pattern = Pattern.compile(URL_REGEX);
+                Matcher matcher = pattern.matcher(message[1]);
+
+                IRCService irc = Main.irc;
+
+                int twitchUserID = UserAccount.getUserID(event.getChannel().getName().replace("#", ""));
+
+                DataBase dataBase = new DataBase();
+                Connection connection = dataBase.getConnection();
+                PreparedStatement ps;
+                ResultSet result;
+
+                if (matcher.find()) {
+                    Osu osu = new Osu();
+
+                    ps = connection.prepareStatement("select * from users where twitch_id = ?");
+                    ps.setLong(1, twitchUserID);
+                    result = ps.executeQuery();
+
+                    if (result.next()) {
+
+                        int osuUserID = result.getInt("id");
+
+                        ObjectMapper mapper = new ObjectMapper();
+                        Map<String, Object> jsonMap = new HashMap<>();
+
+                        jsonMap.put("key", osu.getSecretKey());
+                        jsonMap.put("id", osuUserID);
+                        jsonMap.put("requester", event.getUser().getNick());
+                        jsonMap.put("set_id", Integer.parseInt(matcher.group(1)));
+                        jsonMap.put("map_id", Integer.parseInt(matcher.group(3)));
+                        jsonMap.put("map_name", Beatmap.getBeatmapTitle(matcher.group(3)));
+
+                        String jsonBody = mapper.writeValueAsString(jsonMap);
+
+                        String url = String.format(
+                                "https://api.%s/v1/send_request_message",
+                                osu.getBaseDomain());
+
+                        HttpRequest request = HttpRequest.newBuilder()
+                                .uri(URI.create(url))
+                                .header("Content-Type", "application/json")
+                                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                                .build();
+
+                        HttpClient client = HttpClient.newHttpClient();
+
+                        client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+                        irc.getBot().send().message(event.getChannel().getName(),
+                                Beatmap.getBeatmapTitle(matcher.group(3)) +
+                                        " - Request sent!");
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }
