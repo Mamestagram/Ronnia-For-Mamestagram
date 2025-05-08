@@ -34,14 +34,8 @@ public class RequestMap extends ListenerAdapter {
 
             try {
 
-                String[] message = event.getMessage().split(" ");
-
-                if (message.length != 2) {
-                    return;
-                }
-
                 Pattern pattern = Pattern.compile(URL_REGEX);
-                Matcher matcher = pattern.matcher(message[1]);
+                Matcher matcher = pattern.matcher(event.getMessage());
 
                 IRCService irc = Main.irc;
 
