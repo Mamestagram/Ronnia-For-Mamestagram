@@ -59,6 +59,10 @@ public class RequestMap extends ListenerAdapter {
 
                         ObjectMapper mapper = new ObjectMapper();
                         Map<String, Object> jsonMap = new HashMap<>();
+                        String bpm = Beatmap.getBPM(matcher.group(3));
+                        String length = Beatmap.getBeatmapLength(matcher.group(3));
+                        String difficulty = Beatmap.getBeatmapDifficulty(matcher.group(3));
+                        String status = Beatmap.getBeatmapStatus(matcher.group(3));
 
                         jsonMap.put("key", osu.getSecretKey());
                         jsonMap.put("id", osuUserID);
@@ -66,6 +70,10 @@ public class RequestMap extends ListenerAdapter {
                         jsonMap.put("set_id", Integer.parseInt(matcher.group(1)));
                         jsonMap.put("map_id", Integer.parseInt(matcher.group(3)));
                         jsonMap.put("map_name", Beatmap.getBeatmapTitle(matcher.group(3)));
+                        jsonMap.put("difficulty", difficulty);
+                        jsonMap.put("bpm", bpm);
+                        jsonMap.put("length", length);
+                        jsonMap.put("status", status);
 
                         String jsonBody = mapper.writeValueAsString(jsonMap);
 

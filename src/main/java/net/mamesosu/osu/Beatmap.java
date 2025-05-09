@@ -38,6 +38,89 @@ public abstract class Beatmap {
         return node;
     }
 
+
+    public static String getBeatmapStatus(String beatmapID) {
+
+        String osuAPI = new Osu().getApiKey();
+        String url = "https://osu.ppy.sh/api/get_beatmaps?k=" + osuAPI + "&b=" + beatmapID;
+        JsonNode node = getJson(url);
+
+        if(node.isEmpty()) {
+            return null;
+        }
+
+        String beatmapStatus = node.get(0).get("approved").asText();
+
+        switch (beatmapStatus) {
+            case "-2" -> {
+                return "Graveyard";
+            }
+            case "-1" -> {
+                return "WIP";
+            }
+            case "0" -> {
+                return "Pending";
+            }
+            case "1" -> {
+                return "Ranked";
+            }
+            case "2" -> {
+                return "Approved";
+            }
+            case "3" -> {
+                return "Qualified";
+            }
+            case "4" -> {
+                return "Loved";
+            }
+        }
+
+        return "Graveyard";
+    }
+
+    public static String getBPM(String beatmapSetID) {
+
+        String osuAPI = new Osu().getApiKey();
+        String url = "https://osu.ppy.sh/api/get_beatmaps?k=" + osuAPI + "&s=" + beatmapSetID;
+        JsonNode node = getJson(url);
+
+        if(node.isEmpty()) {
+            return null;
+        }
+
+        return node.get(0).get("bpm").asText();
+    }
+
+    public static String getBeatmapLength(String beatmapID) {
+
+        String osuAPI = new Osu().getApiKey();
+        String url = "https://osu.ppy.sh/api/get_beatmaps?k=" + osuAPI + "&b=" + beatmapID;
+        JsonNode node = getJson(url);
+
+        if(node.isEmpty()) {
+            return null;
+        }
+
+        int beatmapLength = node.get(0).get("total_length").asInt();
+        int minutes = beatmapLength / 60;
+        int seconds = beatmapLength % 60;
+
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+
+    public static String getBeatmapDifficulty(String beatmapID) {
+
+        String osuAPI = new Osu().getApiKey();
+        String url = "https://osu.ppy.sh/api/get_beatmaps?k=" + osuAPI + "&b=" + beatmapID;
+        JsonNode node = getJson(url);
+
+        if(node.isEmpty()) {
+            return null;
+        }
+
+        return String.format("%.2f", node.get(0).get("difficultyrating").asDouble());
+    }
+
     public static String getBeatmapTitle(String beatmapID) {
 
          String osuAPI = new Osu().getApiKey();
