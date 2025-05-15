@@ -72,10 +72,12 @@ public class RequestMap extends ListenerAdapter {
                         jsonMap.put("length", length);
                         jsonMap.put("status", status);
 
+                        System.out.println(length);
+
                         String jsonBody = mapper.writeValueAsString(jsonMap);
 
                         String url = String.format(
-                                "https://api.%s/v1/",
+                                "https://api.%s/v1/send_request_message",
                                 osu.getBaseDomain());
 
                         HttpRequest request = HttpRequest.newBuilder()

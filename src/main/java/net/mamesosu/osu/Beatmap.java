@@ -78,10 +78,10 @@ public abstract class Beatmap {
         return "Graveyard";
     }
 
-    public static String getBPM(String beatmapSetID) {
+    public static String getBPM(String beatmapID) {
 
         String osuAPI = new Osu().getApiKey();
-        String url = "https://osu.ppy.sh/api/get_beatmaps?k=" + osuAPI + "&s=" + beatmapSetID;
+        String url = "https://osu.ppy.sh/api/get_beatmaps?k=" + osuAPI + "&b=" + beatmapID;
         JsonNode node = getJson(url);
 
         if(node.isEmpty()) {
