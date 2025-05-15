@@ -29,9 +29,6 @@ public class RequestMap extends ListenerAdapter {
 
     @Override
     public void onMessage(org.pircbotx.hooks.events.MessageEvent event) {
-
-        if (event.getMessage().contains("!req") || event.getMessage().contains("!request")) {
-
             try {
 
                 Pattern pattern = Pattern.compile(URL_REGEX);
@@ -39,15 +36,15 @@ public class RequestMap extends ListenerAdapter {
 
                 IRCService irc = Main.irc;
 
-                int twitchUserID = UserAccount.getUserID(event.getChannel().getName().replace("#", ""));
-
                 DataBase dataBase = new DataBase();
-                Connection connection = dataBase.getConnection();
-                PreparedStatement ps;
-                ResultSet result;
 
                 if (matcher.find()) {
                     Osu osu = new Osu();
+                    int twitchUserID = UserAccount.getUserID(event.getChannel().getName().replace("#", ""));
+
+                    Connection connection = dataBase.getConnection();
+                    PreparedStatement ps;
+                    ResultSet result;
 
                     ps = connection.prepareStatement("select * from users where twitch_id = ?");
                     ps.setLong(1, twitchUserID);
@@ -78,7 +75,7 @@ public class RequestMap extends ListenerAdapter {
                         String jsonBody = mapper.writeValueAsString(jsonMap);
 
                         String url = String.format(
-                                "https://api.%s/v1/send_request_message",
+                                "https://api.%s/v1/",
                                 osu.getBaseDomain());
 
                         HttpRequest request = HttpRequest.newBuilder()
@@ -99,6 +96,5 @@ public class RequestMap extends ListenerAdapter {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
     }
 }
